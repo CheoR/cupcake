@@ -15,6 +15,7 @@
  */
 package com.example.cupcake
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -28,11 +29,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.cupcake.data.DataSource
+import com.example.cupcake.ui.OrderSummaryScreen
 import com.example.cupcake.ui.OrderViewModel
+import com.example.cupcake.ui.SelectOptionScreen
+import com.example.cupcake.ui.StartOrderScreen
 
 enum class CupcakeScreen() {
     Start,
@@ -85,6 +93,54 @@ fun CupcakeApp(
         }
     ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
+       NavHost(
+           navController = navController,
+           startDestination = CupcakeScreen.Start.name,
+           modifier = Modifier.padding(innerPadding)
+       ) {
+           composable(route = CupcakeScreen.Start.name) {
+               StartOrderScreen(
+                   quantityOptions = DataSource.quantityOptions
+               )
+           }
 
+           /*
+                Context is an abstract class whose implementation is provided by the Android system.
+                It allows access to application-specific resources and classes, as well as up-calls
+                for application-level operations such as launching activities, etc. You can use
+                this variable to get the strings from the list of resource IDs in the view model
+                to display the list of flavors.
+            */
+           composable(route = CupcakeScreen.Flavor.name) {
+               val context = LocalContext.current
+               /*
+                The flavor screen needs to display and update the subtotal when the user selects
+                 a flavor
+
+                 The flavor screen gets the list of flavors from the app's string resources.
+                 Transform the list of resource IDs into a list of strings with
+                 context.resources.getString(id) for each flavor.
+                */
+               SelectOptionScreen(
+                   subtotal = uiState.price,
+                   options = DataSource.flavors.map { id -> context.resources.getString(id) }
+               )
+           }
+
+           composable(route = CupcakeScreen.Pickup.name) {
+               SelectOptionScreen(
+                   subtotal = uiState.price,
+                   options = uiState.pickupOptions,
+                   onSelectionChanged = { viewModel.setDate(it) }
+               )
+           }
+
+           composable(route = CupcakeScreen.Summary.name) {
+               OrderSummaryScreen(
+                   orderUiState = uiState
+               )
+           }
+
+       }
     }
 }
