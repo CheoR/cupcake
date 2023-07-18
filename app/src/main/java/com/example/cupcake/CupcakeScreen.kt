@@ -81,6 +81,10 @@ fun CupcakeAppBar(
 @Composable
 fun CupcakeApp(
     viewModel: OrderViewModel = viewModel(),
+    // NavController - NavHostController class instance
+    // Responsible for navigating between destinations e.g. app screens
+    // use  to navigate between screens, e.g call navigate() to navigate to another destination
+    // call rememberNavController() from a composable function to get NavHostController
     navController: NavHostController = rememberNavController()
 ) {
 
@@ -93,12 +97,20 @@ fun CupcakeApp(
         }
     ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
+        // NavHost - Composable displays other composable destinations, based on a given route
        NavHost(
            navController = navController,
+           // string route defining the destination shown by default when the app first displays the NavHost
            startDestination = CupcakeScreen.Start.name,
            modifier = Modifier.padding(innerPadding)
        ) {
+           // Composable container displays NavGraph's current destination
+           // route is a string that maps to a destination and serves as its unique identifier
+           // A destination is typically a single Composable or group of Composables corresponding
+           // to what the user sees.
            composable(route = CupcakeScreen.Start.name) {
+               // content: Here you can call a composable that you want to display for the given
+               // route.
                StartOrderScreen(
                    quantityOptions = DataSource.quantityOptions
                )
@@ -107,9 +119,10 @@ fun CupcakeApp(
            /*
                 Context is an abstract class whose implementation is provided by the Android system.
                 It allows access to application-specific resources and classes, as well as up-calls
-                for application-level operations such as launching activities, etc. You can use
-                this variable to get the strings from the list of resource IDs in the view model
-                to display the list of flavors.
+                for application-level operations such as launching activities, etc.
+
+                You can use this variable to get the strings from the list of resource IDs in the
+                view model to display the list of flavors.
             */
            composable(route = CupcakeScreen.Flavor.name) {
                val context = LocalContext.current
@@ -123,7 +136,10 @@ fun CupcakeApp(
                 */
                SelectOptionScreen(
                    subtotal = uiState.price,
-                   options = DataSource.flavors.map { id -> context.resources.getString(id) }
+                   options = DataSource.flavors.map { id -> context.resources.getString(id) },
+                   // lambda expression that calls setFlavor() on the view model
+                   // passing in it (the argument passed into onSelectionChanged()).
+                   onSelectionChanged = { viewModel.setFlavor(it) }
                )
            }
 
