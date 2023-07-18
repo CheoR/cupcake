@@ -98,6 +98,24 @@ fun CupcakeApp(
     ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
         // NavHost - Composable displays other composable destinations, based on a given route
+        /*
+            A benefit of using a NavHost to handle app's navigation is that navigation logic is
+            kept separate from individual UI. This avoids some of the major drawbacks of
+            passing the navController as a parameter. E.g.
+                - Navigation logic is kept in one place, which can make code easier to maintain and
+                prevent bugs by not accidentally giving individual screens free reign of navigation
+                in app.
+                - In apps that need to work on different form factors (like portrait mode phone,
+                foldable phone, or large screen tablet), a button may or may not trigger navigation,
+                depending on the app's layout. Individual screens should be self-contained and don't
+                need to be aware of other screens in the app.
+
+            Better approach is to pass a function type into each composable for what should happen
+            when a user does some action, e.g. clicks button. That way, the composable and any of
+            its child composables decide when to call the function. However, navigation logic isn't
+            exposed to the individual screens in app. All the navigation behavior is handled in the
+            NavHost.
+         */
        NavHost(
            navController = navController,
            // string route defining the destination shown by default when the app first displays the NavHost

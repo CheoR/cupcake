@@ -48,7 +48,13 @@ import com.example.cupcake.data.DataSource
  */
 @Composable
 fun StartOrderScreen(
+    //  Pair - pair of values
+    //  takes two generic type parameters, e.g. type Int.
+    // Each item in a pair is accessed by either the first property or second property.
+    // quantityOptions first Int is a resource ID for the string to display on each button
+    // The second Int is the actual quantity of cupcakes.
     quantityOptions: List<Pair<Int, Int>>,
+    onNextButtonClicked: (Int) -> Unit,
     modifier: Modifier = Modifier
 ){
     Column(
@@ -84,7 +90,7 @@ fun StartOrderScreen(
                 quantityOptions.forEach { item ->
                     SelectQuantityButton(
                         labelResourceId = item.first,
-                        onClick = {}
+                        onClick = { onNextButtonClicked(item.second) },
                     )
                 }
             }
@@ -115,6 +121,7 @@ fun SelectQuantityButton(
 fun StartOrderPreview(){
     StartOrderScreen(
         quantityOptions = DataSource.quantityOptions,
+        onNextButtonClicked = {},
         modifier = Modifier.fillMaxSize().padding(dimensionResource(R.dimen.padding_medium))
     )
 }
