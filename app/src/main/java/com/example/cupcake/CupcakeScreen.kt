@@ -15,6 +15,7 @@
  */
 package com.example.cupcake
 
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -130,7 +131,11 @@ fun CupcakeApp(
                // content: Here you can call a composable that you want to display for the given
                // route.
                StartOrderScreen(
-                   quantityOptions = DataSource.quantityOptions
+                   quantityOptions = DataSource.quantityOptions,
+                   onNextButtonClicked = {
+                       viewModel.setQuantity(it)
+                       navController.navigate(CupcakeScreen.Flavor.name)
+                   },
                )
            }
 
@@ -154,24 +159,35 @@ fun CupcakeApp(
                 */
                SelectOptionScreen(
                    subtotal = uiState.price,
+                   onNextButtonClicked = { navController.navigate(CupcakeScreen.Pickup.name) },
+                   onCancelButtonClicked = {},
                    options = DataSource.flavors.map { id -> context.resources.getString(id) },
                    // lambda expression that calls setFlavor() on the view model
                    // passing in it (the argument passed into onSelectionChanged()).
-                   onSelectionChanged = { viewModel.setFlavor(it) }
+                   onSelectionChanged = { viewModel.setFlavor(it) },
+                   modifier = Modifier.fillMaxHeight(),
                )
            }
 
            composable(route = CupcakeScreen.Pickup.name) {
                SelectOptionScreen(
                    subtotal = uiState.price,
+                   onNextButtonClicked = { navController.navigate(CupcakeScreen.Summary.name) },
+                   onCancelButtonClicked = {},
                    options = uiState.pickupOptions,
-                   onSelectionChanged = { viewModel.setDate(it) }
+                   onSelectionChanged = { viewModel.setDate(it) },
+                   modifier = Modifier.fillMaxHeight(),
                )
            }
 
            composable(route = CupcakeScreen.Summary.name) {
                OrderSummaryScreen(
-                   orderUiState = uiState
+                   orderUiState = uiState,
+                   onCancelButtonClicked = {},
+                   onSendButtonClicked = { subject: String, summary: String ->
+
+                   },
+                   modifier = Modifier.fillMaxHeight(),
                )
            }
 
