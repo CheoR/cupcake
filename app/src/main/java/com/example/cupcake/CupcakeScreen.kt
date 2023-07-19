@@ -15,6 +15,8 @@
  */
 package com.example.cupcake
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -190,13 +192,16 @@ fun CupcakeApp(
            }
 
            composable(route = CupcakeScreen.Summary.name) {
+               // reference to the context object so that you can pass it to the shareOrder() function
+               val context = LocalContext.current
+
                OrderSummaryScreen(
                    orderUiState = uiState,
                    onCancelButtonClicked = {
                        cancelOrderAndNavigateToStart(viewModel, navController)
                    },
                    onSendButtonClicked = { subject: String, summary: String ->
-//                       TODO: popup maybe?
+                       shareOrder(context, subject = subject, summary = summary)
                    },
                    modifier = Modifier.fillMaxHeight(),
                )
@@ -224,5 +229,45 @@ private fun cancelOrderAndNavigateToStart(
     navController.popBackStack(
         CupcakeScreen.Start.name,
         inclusive = false
+    )
+}
+
+private fun shareOrder(context: Context, subject: String, summary: String) {
+    /*
+        ShareSheet — user interface component that covers the bottom part of the screen—that shows
+        sharing options.
+            - provided by the Android operating system
+            - call System UI, such as the sharing screen, with Intent
+        Intent - request system to perform some action, commonly presenting a new activity
+            - supply intent with some data, such as a string, and present appropriate sharing
+            actions for that data
+
+        Basic Intent process setup:
+            1. Create  intent object and specify the intent, such as ACTION_SEND.
+            2. Specify the type of additional data to send with the intent e.g.
+                    - text - use "text/plain"
+                    - img - "image/ *" or "video/ *"
+                    - ect
+             3. use putExtra() to ass any additional data to share to the intent, e.g.
+                   - text
+                   - image to share
+            4.  Call context's startActivity(), passing in an activity created from the intent.
+     */
+
+    /*
+        Because doing this in a function passed into apply(), noneed to refer to the object's
+        identifier, intent.
+     */
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        putExtra(Intent.EXTRA_TEXT, summary)
+    }
+
+    context.startActivity(
+        Intent.createChooser(
+            intent,
+            context.getString(R.string.new_cupcake_order)
+        )
     )
 }
