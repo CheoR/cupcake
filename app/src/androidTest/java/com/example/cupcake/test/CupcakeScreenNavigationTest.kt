@@ -9,10 +9,11 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import com.example.cupcake.CupcakeApp
+import com.example.cupcake.CupcakeScreen
 import org.junit.Rule
 import org.junit.Test
 import org.junit.Before
-
+import org.junit.Assert.assertEquals
 
 /*
     Reference TestNavHostController instance to check the navigation route of the nav host to
@@ -42,6 +43,8 @@ class CupcakeScreenNavigationTest {
     @Before
     fun setupCupcakeNavHost() {
         composeTestRule.setContent {
+            //  automatically launches the app
+            // displaying app composable before the execution of any @Test
             //  use this object later to determine the navigation state,
             //  as the app uses the controller to navigate the various screens in app.
             navController = TestNavHostController(LocalContext.current).apply {
@@ -50,6 +53,12 @@ class CupcakeScreenNavigationTest {
             }
             CupcakeApp(navController = navController)
         }
+    }
+
+    @Test
+    fun cupcakeNavHost_verifyStartDestination() {
+        //  nav controller's current back stack entry
+        assertEquals(CupcakeScreen.Start.name, navController.currentBackStackEntry?.destination?.route)
     }
 
 }
