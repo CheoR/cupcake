@@ -14,7 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.Before
 import org.junit.Assert.assertEquals
-
+import com.example.cupcake.R
 /*
     Reference TestNavHostController instance to check the navigation route of the nav host to
     make sure app navigates to the correct place
@@ -69,4 +69,13 @@ class CupcakeScreenNavigationTest {
         val backText = composeTestRule.activity.getString(R.string.back_button)
         composeTestRule.onNodeWithContentDescription(backText).assertDoesNotExist()
     }
+
+    @Test
+    fun cupcakeNavHost_clickOneCupcake_navigatesToSelectFlavorScreen() {
+        composeTestRule.onNodeWithStringId(R.string.one_cupcake)
+            .performClick()
+        navController.assertCurrentRouteName(CupcakeScreen.Flavor.name)
+
+    }
+
 }
