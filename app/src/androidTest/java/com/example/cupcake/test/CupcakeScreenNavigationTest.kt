@@ -1,5 +1,6 @@
 package com.example.cupcake.test
 
+import android.icu.util.Calendar
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -15,6 +16,9 @@ import org.junit.Test
 import org.junit.Before
 import org.junit.Assert.assertEquals
 import com.example.cupcake.R
+import java.text.SimpleDateFormat
+import java.util.Locale
+
 /*
     Reference TestNavHostController instance to check the navigation route of the nav host to
     make sure app navigates to the correct place
@@ -32,13 +36,47 @@ class CupcakeScreenNavigationTest {
 
     private lateinit var navController: TestNavHostController
 
+    private fun navigateToFlavorScreen() {
+        //  The Next button on the Flavor screen not clickable until a flavor is selected.
+        //  This helper method is only meant to prepare the UI for navigation.
+        //  Call this method, then UI should be in a state in which the Next button is clickable.
 
-    fun setupCupcakeNavHost() {
-        composeTestRule.setContent {
-            CupcakeApp()
-        }
+        // click one cupcake button
+        // note this screen has no next button
+        composeTestRule.onNodeWithStringId(R.string.one_cupcake)
+            .performClick()
+
+        // find and click the chocolate option
+        composeTestRule.onNodeWithStringId(R.string.chocolate)
+            .performClick()
     }
 
+    private fun getFormattedDate(): String {
+        val calendar = Calendar.getInstance()
+        calendar.add(java.util.Calendar.DATE, 1)
+        val formatter = SimpleDateFormat("E MMM d", Locale.getDefault())
+        return formatter.format(calendar.time)
+    }
+
+    private fun navigateToPickupScreen() {
+        navigateToFlavorScreen()
+        composeTestRule.onNodeWithStringId(R.string.next)
+            .performClick()
+    }
+
+    private fun navigateToSummaryScreen() {
+        navigateToPickupScreen()
+        composeTestRule.onNodeWithText(getFormattedDate())
+            .performClick()
+        composeTestRule.onNodeWithStringId(R.string.next)
+            .performClick()
+    }
+
+    private fun performNavigateUp() {
+        // helper function to find and click the Up button to navigate to previous screen
+        val backText = composeTestRule.activity.getString(R.string.back_button)
+        composeTestRule.onNodeWithContentDescription(backText).performClick()
+    }
 
     @Before
     fun setupCupcakeNavHost() {
